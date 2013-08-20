@@ -87,7 +87,7 @@ public class JSaDL extends ConsoleApplication {
 		}
 		// Get the config file
 		String configFileString = getProperty(args, "--config=");
-		File configFile = new File(configFileString == null ? "config.ini" : configFileString);
+		File configFile = new File(configFileString == null || configFileString.isEmpty() ? "config.ini" : configFileString);
 		try {
 			this.config = new Config(configFile);
 		} catch (FileNotFoundException e) {
