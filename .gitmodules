@@ -1,4 +1,3 @@
-
-[submodule "dean-commons"]
-	path = dean-commons
-	url = https://github.com/thatJavaNerd/JSaDL.git
+[submodule "DeanCommons"]
+	path = DeanCommons
+	url = https://github.com/thatJavaNerd/DeanCommons.git
