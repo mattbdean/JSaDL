@@ -1,1 +1,4 @@
 
+[submodule "dean-commons"]
+	path = dean-commons
+	url = https://github.com/thatJavaNerd/JSaDL.git
