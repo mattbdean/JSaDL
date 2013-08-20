@@ -59,8 +59,10 @@ Look up source of `java.lang.Object` with a [`Reference`](https://github.com/tha
 
 * `0`: Terminated normally
 * `1`: No class specified
-* `2`: No `config.ini` file found or no file specified with `--config=<file>`
 * `3`: `IOException` while sending a HTTP/GET request to check the availability of a document
 * `10`: An unknown protocol was specified (not http/https or a local file)
 * `11`: The document could not be found (http[s])
 * `12`: The document could not be found (local file)
+* `20`: No `config.ini` file found or no file specified with `--config=<file>`
+* `21`: An IOException occured while reading the file
+* `22`: Bad INI file syntax
