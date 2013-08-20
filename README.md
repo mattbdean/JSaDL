@@ -1,7 +1,7 @@
 Introduction
 =====
 
-The Java Source and Documentation Lookup is a simple command line tool created for looking up source files and Javadoc with ease. This application is based on the idea of a [`Reference`](https://github.com/thatJavaNerd/JSaDL/blob/master/src/net/dean/jsadl/Reference.java). A reference is an object that contains the path or URL to the base source and Javadoc directory for a JDK. For example, I could have a Reference with a source directory of `$JAVA_HOME/src` and a Javadoc directory of `http://docs.oracle.com/javase/7/docs/api/`.
+The Java Source and Documentation Lookup is a command line tool created for looking up source files and Javadoc with ease. This application is based on the idea of a [`Reference`](https://github.com/thatJavaNerd/JSaDL/blob/master/src/net/dean/jsadl/Reference.java). A reference is an object that contains the path or URL to the base source and Javadoc directory for a JDK. For example, I could have a Reference with a source directory of `$JAVA_HOME/src` and a Javadoc directory of `http://docs.oracle.com/javase/7/docs/api/`.
 
 References are specified in [INI files](en.wikipedia.org/wiki/INI_file). Each Section of the INI file represents a Reference. You can specify the source path by adding a key called `src` and the documentation by adding a key called `doc`
 
