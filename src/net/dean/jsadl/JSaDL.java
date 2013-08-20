@@ -70,8 +70,6 @@ public class JSaDL extends ConsoleApplication {
 	public JSaDL(List<Argument> arguments, List<String> args) {
 		super(arguments);
 		this.args = args;
-		// Integer.parseInt("jf\\dsa;klfdsa");
-		exitInternalError(new Exception("Message"), "Test");
 		
 		doLookup();
 	}
