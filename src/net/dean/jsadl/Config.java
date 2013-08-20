@@ -18,14 +18,12 @@ import net.dean.parsers.ini.Section;
  */
 public class Config {
 	private IniFile iniFile;
-	private File configIni;
 	
 	public Config() {
 		this(new File("config.ini"));
 	}
 	
 	public Config(File configIni) {
-		this.configIni = configIni;
 		
 		try {
 			iniFile = new IniFileFactory().build(configIni);
