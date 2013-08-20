@@ -19,21 +19,12 @@ import net.dean.parsers.ini.Section;
 public class Config {
 	private IniFile iniFile;
 	
-	public Config() {
+	public Config() throws FileNotFoundException, IOException, IniSyntaxException {
 		this(new File("config.ini"));
 	}
 	
-	public Config(File configIni) {
-		
-		try {
+	public Config(File configIni) throws FileNotFoundException, IOException, IniSyntaxException {
 			iniFile = new IniFileFactory().build(configIni);
-		} catch (FileNotFoundException e) {
-			System.err.printf("File not found: %s\n", configIni);
-		} catch (IOException e) {
-			System.err.printf("An IO error occured: %s\n", e.getLocalizedMessage());
-		} catch (IniSyntaxException e) {
-			System.err.printf("There was an error while parsing %s: %s\n", configIni.getName(), e.getLocalizedMessage());
-		}
 	}
 	
 	public Reference getRefFor(String name) {

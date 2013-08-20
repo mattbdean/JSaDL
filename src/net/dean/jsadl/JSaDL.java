@@ -2,6 +2,7 @@ package net.dean.jsadl;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import net.dean.console.Argument;
 import net.dean.console.ConsoleApplication;
+import net.dean.parsers.ini.IniSyntaxException;
 import net.dean.util.CollectionUtils;
 import net.dean.util.InternetUtils;
 
@@ -84,8 +86,17 @@ public class JSaDL extends ConsoleApplication {
 			exitNormally();
 		}
 		// Get the config file
-		String configFile = getProperty(args, "--config=");
-		this.config = new Config(new File(configFile == null ? "config.ini" : configFile));
+		String configFileString = getProperty(args, "--config=");
+		File configFile = new File(configFileString == null ? "config.ini" : configFileString);
+		try {
+			this.config = new Config(configFile);
+		} catch (FileNotFoundException e) {
+			exitAbnormally(e, 20);
+		} catch (IOException e) {
+			exitAbnormally(e, 21);
+		} catch (IniSyntaxException e) {
+			exitAbnormally(e, 22);
+		}
 
 		// Get the lookup type
 		LookupType type = LookupType.DOC;
