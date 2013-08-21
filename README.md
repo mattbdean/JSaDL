@@ -74,3 +74,8 @@ If you don't have Ant, you can view directions on how to install it [here](http:
 2. Run the command `ant`. The jar is now located at `dist/jsadl.jar`.
 
 If for some reason you only want to build DeanCommons, use the command `ant build_dean_commons`.
+
+#Setting up for Eclipse
+
+1. `cd` into your workspace directory and run `git clone --recursive https://github.com/thatJavaNerd/JSaDL`.
+2. Create a new Java project using Eclipse for JSaDL using the same directory that it was cloned into.
