@@ -21,12 +21,12 @@ public class Reference {
 	/**
 	 * The base directory of the source files
 	 */
-	private String sourceBase;
+	private URL sourceBase;
 
 	/**
 	 * The base URL of the documentation
 	 */
-	private String docBase;
+	private URL docBase;
 
 	/**
 	 * Instantiates a new Reference.
@@ -35,33 +35,33 @@ public class Reference {
 	 *            The base directory of the source files
 	 * @param docBase
 	 *            The base URL of the documentation
+	 * @throws MalformedURLException
+	 *             If the given source or doc base are invalid URLs
 	 */
-	public Reference(String sourceBase, String docBase) {
+	public Reference(String sourceBase, String docBase) throws MalformedURLException {
 		if (!sourceBase.startsWith("http://") && !sourceBase.startsWith("https://")) {
-			sourceBase = "file://" + sourceBase;
+			this.sourceBase = new URL("file://" + sourceBase);
 		}
 		if (!docBase.startsWith("http://") && !docBase.startsWith("https://")) {
-			docBase = "file://" + docBase;
+			this.docBase = new URL("file://" + docBase);
 		}
-		this.sourceBase = sourceBase;
-		this.docBase = docBase;
 	}
 
 	/**
 	 * Gets the base source directory
 	 * 
-	 * @return A String representation of the base source directory.
+	 * @return The base source directory.
 	 */
-	public String getSourceBase() {
+	public URL getSourceBase() {
 		return sourceBase;
 	}
 
 	/**
 	 * Gets the base documentation URL
 	 * 
-	 * @return A String representation of the base documentation URL.
+	 * @return The base documentation URL.
 	 */
-	public String getDocBase() {
+	public URL getDocBase() {
 		return docBase;
 	}
 
@@ -77,7 +77,7 @@ public class Reference {
 	 */
 	public URL getFor(String clazz, LookupType type) {
 		try {
-			return new URL(new URL(type == LookupType.SOURCE ? sourceBase : docBase), clazz.replace(".", "/")
+			return new URL(type == LookupType.SOURCE ? sourceBase : docBase, clazz.replace(".", "/")
 					+ ((type == LookupType.SOURCE) ? ".java" : ".html"));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

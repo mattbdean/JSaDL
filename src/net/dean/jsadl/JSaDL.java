@@ -88,7 +88,12 @@ public class JSaDL extends ConsoleApplication {
 
 		String referenceName = getProperty(args, "--lookup=");
 
-		Reference ref = config.getRefFor((referenceName != null) ? referenceName : "java");
+		Reference ref = null;
+		try {
+			ref = config.getRefFor((referenceName != null) ? referenceName : "java");
+		} catch (MalformedURLException e) {
+			exitAbnormally(e, 30);
+		}
 		URL target = ref.getFor(args.get(0), type);
 
 		String protocol = target.getProtocol();

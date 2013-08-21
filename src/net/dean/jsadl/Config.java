@@ -3,6 +3,7 @@ package net.dean.jsadl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 import net.dean.parsers.ini.IniFile;
 import net.dean.parsers.ini.IniFileFactory;
@@ -66,8 +67,9 @@ public class Config {
 	 *            The name of the reference to get
 	 * @return A new {@link Reference} based on the name, or null if the
 	 *         reference does not exist.
+	 * @throws MalformedURLException If the given source or doc base are invalid URLs
 	 */
-	public Reference getRefFor(String name) {
+	public Reference getRefFor(String name) throws MalformedURLException {
 		if (iniFile.hasSection(name)) {
 			Section section = iniFile.getSection(name);
 			String src = null, doc = null;
