@@ -31,51 +31,33 @@ import net.dean.util.InternetUtils;
  * 
  */
 public class JSaDL extends ConsoleApplication {
+	/**
+	 * The Config object that reads and parses the config.ini file and gets URLs
+	 * for JSaDL.
+	 */
 	private Config config;
+
+	/**
+	 * A list of arguments passed to the application
+	 */
 	private List<String> args;
 
-	//@formatter:off
-	/*
-	 * Default values:
-	 *  - Lookup Javadoc
-	 *  - Use system editor/viewer
-	 *  - Use config.ini file
-	 *  - Use the reference called "java"
+/**
+	 * Instantiates a new JSaDL
 	 * 
-	 * Examples:
-	 * 
-	 * Look up Javadoc of java.util.List:
-	 * java -jar <jarname> java.util.List
-	 * 
-	 * Look up source of java.util.List:
-	 * java -jar <jarname> java.util.List (-s | --src)
-	 * 
-	 * Look up Javadoc of java.util.List with gvim:
-	 * java -jar <jarname> java.util.List --viewer=gvim
-	 * 
-	 * Look up source of java.util.List in a defined Reference in config.ini named alt_jdk
-	 * java -jar <jarname> java.util.List --lookup=alt_jdk
-	 *
-	 * Command line options:
-	 * --src, -s
-	 * --config=other_config_file.ini
-	 * --lookup=reference (default is "java")
-	 * --viewer=app
-	 * --nocheck
-	 * 
-	 * Exit codes:
-	 * 0 - No Java class given to look up
-	 * 3 - IOException when checking for a 200 response code on a document
-	 * 
+	 * @param arguments A list of Arguments used to satisfy {@link ConsoleApplication#ConsoleApplication(List))
+	 * @param args The arguments passed to this application
 	 */
-	//@formatter:on
 	public JSaDL(List<Argument> arguments, List<String> args) {
 		super(arguments);
 		this.args = args;
-		
+
 		doLookup();
 	}
-	
+
+	/**
+	 * Does the lookup with the given arguments
+	 */
 	private void doLookup() {
 		if (args.size() == 0) {
 			exitAbnormally("No Java class was specified", 1);
@@ -155,6 +137,13 @@ public class JSaDL extends ConsoleApplication {
 		}
 	}
 
+	/**
+	 * Opens the specified URL with the system default viewer/editor.
+	 * 
+	 * @param url
+	 *            The URL to browse to
+	 * @see java.awt.Desktop#browse(java.net.URI)
+	 */
 	private void openWithDefault(URL url) {
 		if (!Desktop.isDesktopSupported()) {
 			System.err.println("Java Desktop is not supported. Please specify a program and try again.");
@@ -169,6 +158,18 @@ public class JSaDL extends ConsoleApplication {
 		}
 	}
 
+	/**
+	 * Starts a new process with this structure:
+	 * 
+	 * <blockquote><code>
+	 * {@code <viewer> <url>}
+	 * </code></blockquote>
+	 * 
+	 * @param url
+	 *            The URL to browse to
+	 * @param program
+	 *            The program to use
+	 */
 	private void openWithProgram(URL url, String program) {
 		ProcessBuilder pb = new ProcessBuilder(program, new File(url.getFile()).getAbsolutePath());
 		try {
@@ -178,6 +179,19 @@ public class JSaDL extends ConsoleApplication {
 		}
 	}
 
+	/**
+	 * Gets the value of a property from the command line arguments. For
+	 * example, if the argument <code>--viewer=vim</code> was passed, then when
+	 * this method is called like this:
+	 * <code>getProperty(args, "--viewer=")</code>, this method would return
+	 * <code>vim</code>.
+	 * 
+	 * @param args
+	 *            The arguments to search
+	 * @param propertyName
+	 *            The full name and key of the property
+	 * @return The value of the given key
+	 */
 	private String getProperty(List<String> args, String propertyName) {
 		// TODO: Add support for properties with quotes
 
@@ -211,7 +225,7 @@ public class JSaDL extends ConsoleApplication {
 		System.out.println("You can find the source to this project at https://github.com/thatJavaNerd/JSaDL.git");
 		printArguments();
 	}
-	
+
 	public static void main(String[] args) {
 		List<Argument> arguments = new ArrayList<>();
 		arguments.add(new Argument("-s", "--src", "Shows the source code instead of the Javadoc"));
