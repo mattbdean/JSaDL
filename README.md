@@ -1,5 +1,4 @@
-Introduction
-=====
+#Introduction
 
 The Java Source and Documentation Lookup is a command line tool created for looking up source files and Javadoc with ease. This application is based on the idea of a [`Reference`](https://github.com/thatJavaNerd/JSaDL/blob/master/src/net/dean/jsadl/Reference.java). A reference is an object that contains the path or URL to the base source and Javadoc directory for a JDK. For example, I could have a Reference with a source directory of `$JAVA_HOME/src` and a Javadoc directory of `http://docs.oracle.com/javase/7/docs/api/`.
 
@@ -54,8 +53,8 @@ Look up the Javadoc of `java.lang.Object` with vim:
 Look up source of `java.lang.Object` with a [`Reference`](https://github.com/thatJavaNerd/JSaDL/blob/master/src/net/dean/jsadl/Reference.java) named `alt_jdk`
 
     java -jar <jarname> java.lang.Object --lookup=alt_jdk
-    
-###Exit Codes:
+
+###Exit codes
 
 * `0`: Terminated normally
 * `1`: No class specified
@@ -66,3 +65,12 @@ Look up source of `java.lang.Object` with a [`Reference`](https://github.com/tha
 * `20`: No `config.ini` file found or no file specified with `--config=<file>`
 * `21`: An IOException occured while reading the file
 * `22`: Bad INI file syntax
+    
+#Building from source with Apache Ant
+
+If you don't have Ant, you can view directions on how to install it [here](http://ant.apache.org/manual/install.html).
+
+1. First, clone the repo. For Git 1.6.5+, use `git clone --recursive https://github.com/thatJavaNerd/JSaDL.git`. For older versions, use `git clone https://github.com/thatJavaNerd/JSaDL.git`. Then, go into the `JSaDL` directory, and run these two commands: `git submodule init`, `git submodule update`.
+2. Run the command `ant`. The jar is now located at `dist/jsadl.jar`.
+
+If for some reason you only want to build DeanCommons, use the command `ant build_dean_commons`.
