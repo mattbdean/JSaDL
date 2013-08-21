@@ -51,8 +51,6 @@ public class JSaDL extends ConsoleApplication {
 	public JSaDL(List<Argument> arguments, List<String> args) {
 		super(arguments);
 		this.args = args;
-
-		doLookup();
 	}
 
 	/**
