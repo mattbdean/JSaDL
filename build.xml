@@ -1,0 +1,83 @@
+<project name="JSaDL" basedir="." default="make">
+	<property name="src" location="src/" />
+	<property name="bin" location="bin/" />
+	<property name="dist" location="dist/" />
+	<property name="lib" location="lib/" />
+	<property name="dean_commons" location="DeanCommons/" />
+	<property name="dean_commons.src" location="${dean_commons}/src/" />
+	<property name="dean_commons.bin" location="${dean_commons}/bin/" />
+	<property name="dean_commons.dist" location="${dean_commons}/dist/" />
+	<property name="dean_commons.lib" location="${dean_commons}/lib/" />
+
+	<path id="dean_commons_classpath">
+		<fileset dir="${dean_commons.lib}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<path id="jsadl_classpath">
+		<fileset dir="${lib}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<!--
+		1. Clean the workspace
+		2. Make bin and dist folders
+		3. Compile and jar Dean Commons with jfxrt.jar and place it in the lib folder
+		4. Copy all the files from Dean Commons' lib folder to JSaDL's lib folder
+		4. Create the manifest for JSaDL
+		5. Compile and jar JSaDL with deancommons.jar 
+	-->
+
+	<target name="clean">
+		<delete dir="${bin}" failonerror="false"/>
+		<delete dir="${dist}" failonerror="false" />
+		<delete dir="${dean_commons.bin}" failonerror="false"/>
+		<delete dir="${dean_commons.dist}" failonerror="false"/>
+	</target>
+
+	<target name="init" depends="clean">
+		<!-- Create the time stamp -->
+		<tstamp />
+
+		<!-- Create the build directory structure -->
+		<mkdir dir="${bin}" />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${dean_commons.bin}" />
+		<mkdir dir="${dean_commons.dist}" />
+	</target>
+
+	<!-- Compile and jar DeanCommons -->
+	<target name="build_dean_commons" depends="init">
+		<javac includeantruntime="false" srcdir="${dean_commons.src}" destdir="${dean_commons.bin}">
+			<classpath refid="dean_commons_classpath" />
+		</javac>
+
+		<!-- Copy DeanCommons lib folder -->
+		<copy todir="${lib}">
+			<fileset dir="${dean_commons.lib}">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+
+		<jar jarfile="${lib}/deancommons.jar" basedir="${dean_commons.bin}" />
+	</target>
+
+	<!-- Compile and jar JSaDL -->
+	<target name="make" depends="build_dean_commons">
+		<javac includeantruntime="false" srcdir="${src}" destdir="${bin}">
+			<classpath refid="jsadl_classpath" />
+		</javac>
+
+
+		<jar jarfile="${dist}/jsadl.jar" basedir="${bin}">
+			<!-- Generate the manifest -->
+			<manifest>
+				<attribute name="Main-Class" value="net.dean.jsadl.JSaDL" />
+			</manifest>
+			<zipgroupfileset dir="${lib}" includes="deancommons.jar" />
+		</jar>
+
+	</target>
+</project>
