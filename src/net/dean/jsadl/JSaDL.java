@@ -190,20 +190,6 @@ public class JSaDL extends ConsoleApplication {
 		return null;
 	}
 
-	public static void main(String[] args) {
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new Argument("-s", "--src", "Shows the source code instead of the Javadoc"));
-		arguments.add(new Argument("", "--config=<file>", "Uses a different configuration file"));
-		arguments.add(new Argument("", "--lookup=<reference>", "Sets the name of the reference to use"));
-		arguments.add(new Argument("", "--viewer=<app>", "Uses a program to view the file instead of the system default"));
-		arguments.add(new Argument("", "--nocheck",
-				"Disables checking for an existing file/200 HTTP response before trying to view the document"));
-		JSaDL saddle = new JSaDL(arguments, CollectionUtils.toCollection(args));
-		saddle.setSupportSite("https://github.com/thatJavaNerd/JSaDL/issues");
-		saddle.doLookup();
-		
-	}
-
 	@Override
 	protected String getMaker() {
 		return "thatJavaNerd";
@@ -224,5 +210,18 @@ public class JSaDL extends ConsoleApplication {
 		printSampleIntro();
 		System.out.println("You can find the source to this project at https://github.com/thatJavaNerd/JSaDL.git");
 		printArguments();
+	}
+	
+	public static void main(String[] args) {
+		List<Argument> arguments = new ArrayList<>();
+		arguments.add(new Argument("-s", "--src", "Shows the source code instead of the Javadoc"));
+		arguments.add(new Argument("", "--config=<file>", "Uses a different configuration file"));
+		arguments.add(new Argument("", "--lookup=<reference>", "Sets the name of the reference to use"));
+		arguments.add(new Argument("", "--viewer=<app>", "Uses a program to view the file instead of the system default"));
+		arguments.add(new Argument("", "--nocheck",
+				"Disables checking for an existing file/200 HTTP response before trying to view the document"));
+		JSaDL saddle = new JSaDL(arguments, CollectionUtils.toCollection(args));
+		saddle.setSupportSite("https://github.com/thatJavaNerd/JSaDL/issues");
+		saddle.doLookup();
 	}
 }
