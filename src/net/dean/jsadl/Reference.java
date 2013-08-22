@@ -42,8 +42,12 @@ public class Reference {
 		if (!sourceBase.startsWith("http://") && !sourceBase.startsWith("https://")) {
 			this.sourceBase = new URL("file://" + sourceBase);
 		}
+		
+		// TODO: Look for URL protocol instead
 		if (!docBase.startsWith("http://") && !docBase.startsWith("https://")) {
 			this.docBase = new URL("file://" + docBase);
+		} else {
+			this.docBase = new URL(docBase);
 		}
 	}
 
@@ -77,7 +81,7 @@ public class Reference {
 	 */
 	public URL getFor(String clazz, LookupType type) {
 		try {
-			return new URL(type == LookupType.SOURCE ? sourceBase : docBase, clazz.replace(".", "/")
+			return new URL(type == LookupType.SOURCE ? sourceBase.toExternalForm() : docBase.toExternalForm() + clazz.replace(".", "/")
 					+ ((type == LookupType.SOURCE) ? ".java" : ".html"));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
