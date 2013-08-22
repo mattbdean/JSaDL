@@ -155,6 +155,10 @@ public class JSaDL extends ConsoleApplication {
 
 		Desktop d = Desktop.getDesktop();
 		try {
+			if (url.getProtocol().equals("file")) {
+				d.open(new File(url.toURI()));
+				return;
+			}
 			d.browse(url.toURI());
 		} catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
