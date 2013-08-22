@@ -80,7 +80,7 @@ public class JSaDL extends ConsoleApplication {
 
 		// Get the lookup type
 		LookupType type = LookupType.DOC;
-		if (args.contains("--src") || args.contains("-s")) {
+		if (args.contains("--source") || args.contains("-s")) {
 			type = LookupType.SOURCE;
 		}
 
@@ -235,7 +235,7 @@ public class JSaDL extends ConsoleApplication {
 
 	public static void main(String[] args) {
 		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new Argument("-s", "--src", "Shows the source code instead of the Javadoc"));
+		arguments.add(new Argument("-s", "--source", "Shows the source code instead of the Javadoc"));
 		arguments.add(new Argument("", "--config=<file>", "Uses a different configuration file"));
 		arguments.add(new Argument("", "--lookup=<reference>", "Sets the name of the reference to use"));
 		arguments.add(new Argument("", "--viewer=<app>", "Uses a program to view the file instead of the system default"));

@@ -19,14 +19,14 @@ By default, JSaDL will look for References in a file called `config.ini` in the 
 #Usage
 
 ```bash
-java -jar <jarfile> [--help] <classname> [-s | --src] [--lookup=<reference>] [--viewer=<app>] [--nocheck]
+java -jar <jarfile> [--help] <classname> [-s | --source] [--lookup=<reference>] [--viewer=<app>] [--nocheck]
 ```
 
 ###Parameters:
 
 * `--help`: Displays a help message
 * `classname`: The name of the Java class you want to look up
-* `-s`,  `--src`: Look up source instead of Javadoc
+* `-s`,  `--source`: Look up source instead of Javadoc
 * `--lookup=<reference>`: Specifies the reference to use. If none is specified, `java` is used
 * `--config=<file>`: Changes where JSaDL will look for References
 * `--viewer=<app>`: Specifies the application that will be used to view the source/documentation
