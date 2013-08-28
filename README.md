@@ -68,6 +68,7 @@ Look up source of `java.lang.Object` with a [`Reference`](https://github.com/tha
 * `20`: No `config.ini` file found or no file specified with `--config=<file>`
 * `21`: An IOException occured while reading the file
 * `22`: Bad INI file syntax
+* `30`: The given program could not be found
     
 #Building from source with Apache Ant
 

@@ -15,6 +15,7 @@ import net.dean.console.ConsoleApplication;
 import net.dean.parsers.ini.IniSyntaxException;
 import net.dean.util.CollectionUtils;
 import net.dean.util.InternetUtils;
+import net.dean.util.file.FileUtil;
 
 /*
  * JSadl.java
@@ -42,7 +43,7 @@ public class JSaDL extends ConsoleApplication {
 	 */
 	private List<String> args;
 
-/**
+	/**
 	 * Instantiates a new JSaDL
 	 * 
 	 * @param arguments A list of Arguments used to satisfy {@link ConsoleApplication#ConsoleApplication(List))
@@ -92,10 +93,10 @@ public class JSaDL extends ConsoleApplication {
 		} catch (MalformedURLException e) {
 			exitAbnormally(e, 5);
 		}
-		
+
 		// If 'java' doesn't exist
 		ref = getDefaultReference();
-		
+
 		URL target = ref.getFor(args.get(0), type);
 
 		String protocol = target.getProtocol();
@@ -140,7 +141,9 @@ public class JSaDL extends ConsoleApplication {
 		if (viewer == null) {
 			openWithDefault(target);
 		} else {
-			openWithProgram(target, viewer);
+			if (!openWithProgram(target, viewer)) {
+				exitAbnormally("The program \"" + viewer + "\" could not be found or is not in the PATH.", 30);
+			}
 		}
 	}
 
@@ -152,6 +155,49 @@ public class JSaDL extends ConsoleApplication {
 	 * @see java.awt.Desktop#browse(java.net.URI)
 	 */
 	private void openWithDefault(URL url) {
+		String program = null;
+
+		// Try to determine the program to use
+		switch (FileUtil.getOS()) {
+		case LINUX:
+		case SOLARIS:
+			// Linux uses xdg-open
+			if (FileUtil.isInPath("xdg-open")) {
+				program = "xdg-open";
+			} else {
+				if (new File("/usr/bin/xdg-open").exists()) {
+					program = "/usr/bin/xdg-open";
+				}
+			}
+			break;
+		case MAC:
+			program = "open";
+			break;
+		case WINDOWS:
+			// Windows uses "cmd.exe /c"
+			if (FileUtil.isInPath("cmd.exe")) {
+				program = "cmd.exe /c";
+			} else {
+				if (new File("C:\\Windows\\System32\\cmd.exe").exists()) {
+					program = "C:\\Windows\\System32\\cmd.exe /c";
+				}
+			}
+			break;
+		default:
+			// This applies to OperatingSystem.UNKNOWN or any other new OS enums
+			// added in the future
+			break;
+		}
+
+		if (program != null) {
+			if (openWithProgram(url, program)) {
+				// Everything went smoothly
+				exitNormally();
+			}
+
+			// Eh, not so much. Try and use Desktop.
+		}
+
 		if (!Desktop.isDesktopSupported()) {
 			exitAbnormally("Java Desktop is not supported. Please specify a program and try again.", 2);
 		}
@@ -180,12 +226,17 @@ public class JSaDL extends ConsoleApplication {
 	 * @param program
 	 *            The program to use
 	 */
-	private void openWithProgram(URL url, String program) {
-		ProcessBuilder pb = new ProcessBuilder(program, new File(url.getFile()).getAbsolutePath());
+	private boolean openWithProgram(URL url, String program) {
+		ProcessBuilder pb = new ProcessBuilder().command(program, url.toExternalForm());
 		try {
-			pb.start();
-		} catch (IOException e) {
+			Process p = pb.start();
+			// Make sure it starts
+			int exit = p.waitFor();
+			System.out.printf("%s exited with code %s\n", program, exit);
+			return true;
+		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 
@@ -213,7 +264,7 @@ public class JSaDL extends ConsoleApplication {
 
 		return null;
 	}
-	
+
 	private Reference getDefaultReference() {
 		// Look for the java reference
 		if (config.getIniFile().hasSection("java")) {
@@ -223,7 +274,7 @@ public class JSaDL extends ConsoleApplication {
 				exitAbnormally(e, 5);
 			}
 		}
-		
+
 		// Look for the first reference (if there are any)
 		if (config.getIniFile().getSections().size() > 0) {
 			try {
@@ -232,20 +283,21 @@ public class JSaDL extends ConsoleApplication {
 				exitAbnormally(e, 5);
 			}
 		}
-		
+
 		String source = null, docs = null;
-		
-//		File f;
-//		if ((f = new File("docs/")).exists()) {
-//			docs = "file://" + f.getAbsolutePath();
-//		} else if (((f = new File(System.getProperty("java.home") + "src/")).exists())) {
-//			
-//		}
+
+		// File f;
+		// if ((f = new File("docs/")).exists()) {
+		// docs = "file://" + f.getAbsolutePath();
+		// } else if (((f = new File(System.getProperty("java.home") +
+		// "src/")).exists())) {
+		//
+		// }
 		List<File> folders = new ArrayList<>();
 		folders.add(new File(System.getProperty("user.dir")));
 		folders.add(new File(System.getProperty("java.home")));
 		folders.add(new File(System.getenv("JAVA_HOME")));
-		
+
 		File sourceFolder = null;
 		for (File f : folders) {
 			if ((sourceFolder = new File(f, "src/")).exists()) {
@@ -253,11 +305,13 @@ public class JSaDL extends ConsoleApplication {
 				break;
 			}
 		}
-		
+
 		if (sourceFolder == null) {
-			exitAbnormally("Unable to find a source folder for the default Reference. Please add at least one Reference to your config.ini.", 4);
+			exitAbnormally(
+					"Unable to find a source folder for the default Reference. Please add at least one Reference to your config.ini.",
+					4);
 		}
-		
+
 		File docsFolder = null;
 		for (File f : folders) {
 			if ((sourceFolder = new File(f, "doc/")).exists()) {
@@ -269,7 +323,7 @@ public class JSaDL extends ConsoleApplication {
 			// Resort to online
 			docs = "http://docs.oracle.com/javase/7/docs/api/";
 		}
-		
+
 		try {
 			return new Reference(source, docs);
 		} catch (MalformedURLException e) {
