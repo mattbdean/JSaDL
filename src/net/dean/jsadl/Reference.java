@@ -81,7 +81,8 @@ public class Reference {
 	 */
 	public URL getFor(String clazz, LookupType type) {
 		try {
-			return new URL(type == LookupType.SOURCE ? sourceBase.toExternalForm() : docBase.toExternalForm() + clazz.replace(".", "/")
+			
+			return new URL((type == LookupType.SOURCE ? sourceBase.toExternalForm() : docBase.toExternalForm()) + clazz.replace(".", "/")
 					+ ((type == LookupType.SOURCE) ? ".java" : ".html"));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
