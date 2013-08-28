@@ -67,7 +67,8 @@ public class Config {
 	 *            The name of the reference to get
 	 * @return A new {@link Reference} based on the name, or null if the
 	 *         reference does not exist.
-	 * @throws MalformedURLException If the given source or doc base are invalid URLs
+	 * @throws MalformedURLException
+	 *             If the given source or doc base are invalid URLs
 	 */
 	public Reference getRefFor(String name) throws MalformedURLException {
 		if (iniFile.hasSection(name)) {
@@ -84,5 +85,14 @@ public class Config {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Gets the IniFile associated with this Config.
+	 * 
+	 * @return The IniFile
+	 */
+	public IniFile getIniFile() {
+		return iniFile;
 	}
 }

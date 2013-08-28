@@ -88,10 +88,14 @@ public class JSaDL extends ConsoleApplication {
 
 		Reference ref = null;
 		try {
-			ref = config.getRefFor((referenceName != null) ? referenceName : "java");
+			ref = referenceName != null ? config.getRefFor(referenceName) : getDefaultReference();
 		} catch (MalformedURLException e) {
-			exitAbnormally(e, 30);
+			exitAbnormally(e, 5);
 		}
+		
+		// If 'java' doesn't exist
+		ref = getDefaultReference();
+		
 		URL target = ref.getFor(args.get(0), type);
 
 		String protocol = target.getProtocol();
@@ -149,8 +153,7 @@ public class JSaDL extends ConsoleApplication {
 	 */
 	private void openWithDefault(URL url) {
 		if (!Desktop.isDesktopSupported()) {
-			System.err.println("Java Desktop is not supported. Please specify a program and try again.");
-			exit(3);
+			exitAbnormally("Java Desktop is not supported. Please specify a program and try again.", 3);
 		}
 
 		Desktop d = Desktop.getDesktop();
@@ -208,6 +211,70 @@ public class JSaDL extends ConsoleApplication {
 			}
 		}
 
+		return null;
+	}
+	
+	private Reference getDefaultReference() {
+		// Look for the java reference
+		if (config.getIniFile().hasSection("java")) {
+			try {
+				return config.getRefFor("java");
+			} catch (MalformedURLException e) {
+				exitAbnormally(e, 5);
+			}
+		}
+		
+		// Look for the first reference (if there are any)
+		if (config.getIniFile().getSections().size() > 0) {
+			try {
+				return config.getRefFor(config.getIniFile().getSections().get(0).getName());
+			} catch (MalformedURLException e) {
+				exitAbnormally(e, 5);
+			}
+		}
+		
+		String source = null, docs = null;
+		
+//		File f;
+//		if ((f = new File("docs/")).exists()) {
+//			docs = "file://" + f.getAbsolutePath();
+//		} else if (((f = new File(System.getProperty("java.home") + "src/")).exists())) {
+//			
+//		}
+		List<File> folders = new ArrayList<>();
+		folders.add(new File(System.getProperty("user.dir")));
+		folders.add(new File(System.getProperty("java.home")));
+		folders.add(new File(System.getenv("JAVA_HOME")));
+		
+		File sourceFolder = null;
+		for (File f : folders) {
+			if ((sourceFolder = new File(f, "src/")).exists()) {
+				source = sourceFolder.getAbsolutePath();
+				break;
+			}
+		}
+		
+		if (sourceFolder == null) {
+			exitAbnormally("Unable to find a source folder for the default Reference. Please add at least one Reference to your config.ini.", 4);
+		}
+		
+		File docsFolder = null;
+		for (File f : folders) {
+			if ((sourceFolder = new File(f, "doc/")).exists()) {
+				source = sourceFolder.getAbsolutePath();
+				break;
+			}
+		}
+		if (docsFolder == null) {
+			// Resort to online
+			docs = "http://docs.oracle.com/javase/7/docs/api/";
+		}
+		
+		try {
+			return new Reference(source, docs);
+		} catch (MalformedURLException e) {
+			exitInternalError(e, "Malformed URL while generating default Reference: " + e.getLocalizedMessage());
+		}
 		return null;
 	}
 
