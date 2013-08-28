@@ -58,7 +58,10 @@ Look up source of `java.lang.Object` with a [`Reference`](https://github.com/tha
 
 * `0`: Terminated normally
 * `1`: No class specified
+* `2`: Java Desktop is not supported on this OS. See [this question](http://stackoverflow.com/q/102325/1275092) on StackOverflow.
 * `3`: `IOException` while sending a HTTP/GET request to check the availability of a document
+* `4`: No source folder found for the default reference
+* `5`: A bad URL was specified in the config.ini file
 * `10`: An unknown protocol was specified (not http/https or a local file)
 * `11`: The document could not be found (http[s])
 * `12`: The document could not be found (local file)

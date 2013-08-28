@@ -153,7 +153,7 @@ public class JSaDL extends ConsoleApplication {
 	 */
 	private void openWithDefault(URL url) {
 		if (!Desktop.isDesktopSupported()) {
-			exitAbnormally("Java Desktop is not supported. Please specify a program and try again.", 3);
+			exitAbnormally("Java Desktop is not supported. Please specify a program and try again.", 2);
 		}
 
 		Desktop d = Desktop.getDesktop();
