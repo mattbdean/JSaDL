@@ -1,5 +1,6 @@
 package net.dean.jsadl;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -42,7 +43,7 @@ public class Reference {
 		if (!sourceBase.startsWith("http://") && !sourceBase.startsWith("https://")) {
 			this.sourceBase = new URL("file://" + sourceBase);
 		}
-		
+
 		// TODO: Look for URL protocol instead
 		if (!docBase.startsWith("http://") && !docBase.startsWith("https://")) {
 			this.docBase = new URL("file://" + docBase);
@@ -81,9 +82,11 @@ public class Reference {
 	 */
 	public URL getFor(String clazz, LookupType type) {
 		try {
-			
-			return new URL((type == LookupType.SOURCE ? sourceBase.toExternalForm() : docBase.toExternalForm()) + clazz.replace(".", "/")
-					+ ((type == LookupType.SOURCE) ? ".java" : ".html"));
+			String base = type == LookupType.SOURCE ? sourceBase.toExternalForm() : docBase.toExternalForm();
+			if (!base.endsWith(File.separator)) {
+				base += File.separator;
+			}
+			return new URL(base + clazz.replace(".", "/") + ((type == LookupType.SOURCE) ? ".java" : ".html"));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
