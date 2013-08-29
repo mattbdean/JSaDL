@@ -98,9 +98,6 @@ public class JSaDL extends ConsoleApplication {
 			exitAbnormally(e, 5);
 		}
 
-		// If 'java' doesn't exist
-		ref = getDefaultReference();
-
 		URL target = ref.getFor(args.get(0), type);
 
 		String protocol = target.getProtocol();
