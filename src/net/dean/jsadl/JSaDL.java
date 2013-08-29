@@ -12,6 +12,7 @@ import java.util.List;
 
 import net.dean.console.Argument;
 import net.dean.console.ConsoleApplication;
+import net.dean.jsadl.Configurator.Config;
 import net.dean.parsers.ini.IniSyntaxException;
 import net.dean.util.CollectionUtils;
 import net.dean.util.InternetUtils;
@@ -32,18 +33,19 @@ import net.dean.util.file.FileUtil;
  * 
  */
 public class JSaDL extends ConsoleApplication {
+	public static final String CONFIG_FILE_NAME = "config.ini";
 	/**
-	 * The Config object that reads and parses the config.ini file and gets URLs
-	 * for JSaDL.
+	 * The Config object that reads and parses the {@value #CONFIG_FILE_NAME}
+	 * file and gets URLs for JSaDL.
 	 */
-	private Config config;
+	private Configurator configurator;
 
 	/**
 	 * A list of arguments passed to the application
 	 */
 	private List<String> args;
 
-	/**
+/**
 	 * Instantiates a new JSaDL
 	 * 
 	 * @param arguments A list of Arguments used to satisfy {@link ConsoleApplication#ConsoleApplication(List))
@@ -68,9 +70,11 @@ public class JSaDL extends ConsoleApplication {
 		}
 		// Get the config file
 		String configFileString = getProperty(args, "--config=");
-		File configFile = new File(configFileString == null || configFileString.isEmpty() ? "config.ini" : configFileString);
+		File configFile = new File(configFileString == null || configFileString.isEmpty() ? CONFIG_FILE_NAME
+				: configFileString);
 		try {
-			this.config = new Config(configFile);
+			this.configurator = new Configurator(this);
+			configurator.configure(configFile);
 		} catch (FileNotFoundException e) {
 			exitAbnormally(e, 20);
 		} catch (IOException e) {
@@ -89,7 +93,7 @@ public class JSaDL extends ConsoleApplication {
 
 		Reference ref = null;
 		try {
-			ref = referenceName != null ? config.getRefFor(referenceName) : getDefaultReference();
+			ref = referenceName != null ? configurator.getConfig().getRefFor(referenceName) : getDefaultReference();
 		} catch (MalformedURLException e) {
 			exitAbnormally(e, 5);
 		}
@@ -146,6 +150,7 @@ public class JSaDL extends ConsoleApplication {
 			}
 		}
 	}
+
 
 	/**
 	 * Opens the specified URL with the system default viewer/editor.
@@ -266,6 +271,7 @@ public class JSaDL extends ConsoleApplication {
 	}
 
 	private Reference getDefaultReference() {
+		Config config = configurator.getConfig();
 		// Look for the java reference
 		if (config.getIniFile().hasSection("java")) {
 			try {
@@ -308,8 +314,8 @@ public class JSaDL extends ConsoleApplication {
 
 		if (sourceFolder == null) {
 			exitAbnormally(
-					"Unable to find a source folder for the default Reference. Please add at least one Reference to your config.ini.",
-					4);
+					"Unable to find a source folder for the default Reference. Please add at least one Reference to your "
+							+ CONFIG_FILE_NAME + ".", 4);
 		}
 
 		File docsFolder = null;
