@@ -79,26 +79,44 @@ public class Configurator {
 						return;
 					}
 				}
+
+				// At this point none of the sections represent valid
+				// References.
+				// We have to make a new one.
+				getAndExportRef(iniFile);
 			}
 		} else {
 			// Config file does not exist, ask for values for doc and source,
 			// and also name of default reference
-			String doc = getLocation("documentation", "http://docs.oracle.com/javase/7/docs/api/");
-			String src = getLocation("source", System.getProperty("java.home") + "/src/");
-			
-			System.out.printf("Please choose a name for your Reference. Press enter for [%s]\n", "java");
-			String ref = saddle.getInput(new InputFilter() {
-				
-				@Override
-				public boolean accept(String input) {
-					return true;
-				}
-			}, "java");
-			exportValues(src, doc, ref, iniFile);
-			config = new Config(iniFile);
+			getAndExportRef(iniFile);
 		}
 	}
-	
+
+	private void getAndExportRef(File iniFile) {
+		// Here we make a new Reference from user input.
+		String doc = getLocation("documentation", "http://docs.oracle.com/javase/7/docs/api/");
+		String src = getLocation("source", System.getProperty("java.home") + "/src/");
+
+		System.out.printf("Please choose a name for your Reference. Press enter for [%s]\n", "java");
+		String ref = saddle.getInput(new InputFilter() {
+
+			@Override
+			public boolean accept(String input) {
+				return true;
+			}
+		}, "java");
+		
+		// Save the values to the Ini file
+		exportValues(src, doc, ref, iniFile);
+		try {
+			// Instantiate the Config
+			config = new Config(iniFile);
+			return;
+		} catch (IOException | IniSyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void exportValues(String src, String doc, String refName, File f) {
 		IniFile ini = null;
 		if (f.exists()) {
@@ -112,7 +130,7 @@ public class Configurator {
 		} else {
 			ini = new IniFileFactory().newIniFile();
 		}
-		
+
 		Section s = null;
 		if (ini.hasSection(refName)) {
 			s = ini.getSection(refName);
@@ -122,15 +140,15 @@ public class Configurator {
 		} else {
 			s = new Section(refName);
 		}
-		
-		if (!s.hasKey("src")) {
+
+		if (!s.hasKey("src") && src != null) {
 			s.put(new IniElement("src", src));
 		}
-		if (!s.hasKey("doc")) {
+		if (!s.hasKey("doc") && doc != null) {
 			s.put(new IniElement("doc", doc));
 		}
 		ini.getSections().add(s);
-		
+
 		IniFileTransformer.recommended().export(ini, f);
 	}
 
@@ -147,13 +165,15 @@ public class Configurator {
 					} else {
 						url = new URL("file://" + input);
 					}
-					
+
 					// Checking for files
 					if (url.getProtocol().equals("file")) {
-						// If the directory does not exist or if it isn't a directory at all
+						// If the directory does not exist or if it isn't a
+						// directory at all
 						if (!new File(url.getFile()).exists() || !new File(url.getFile()).isDirectory()) {
 							// Prompt the user if they really want to use it
-							return (saddle.getYesNoInput(String.format("%s doesn't seem to exist. Do you still want to use it? (y/n)", url.getFile())));
+							return (saddle.getYesNoInput(String.format(
+									"%s doesn't seem to exist. Do you still want to use it? (y/n)", url.getFile())));
 						} else {
 							// The directory exists, add it
 							return true;
@@ -161,8 +181,11 @@ public class Configurator {
 					} else {
 						// HTTP or HTTPS
 						if (InternetUtils.doGetRequest(url.toExternalForm()).getResponseCode() != 200) {
-							// If the GET request doesn't return a 200, ask the user if they really want to use it
-							return (saddle.getYesNoInput(String.format("%s doesn't appear to be online.  Do you still want to use it? (y/n)", url.toExternalForm())));
+							// If the GET request doesn't return a 200, ask the
+							// user if they really want to use it
+							return (saddle.getYesNoInput(String.format(
+									"%s doesn't appear to be online.  Do you still want to use it? (y/n)",
+									url.toExternalForm())));
 						} else {
 							// Returned 200, all is well
 							return true;
@@ -176,7 +199,7 @@ public class Configurator {
 					e.printStackTrace();
 					return false;
 				}
-				
+
 			}
 		}, defaultValue);
 	}
