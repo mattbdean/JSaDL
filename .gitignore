@@ -4,3 +4,11 @@ lib/
 .classpath
 .project
 config.ini
+
+# Error logs
+*.log
+
+# Backup files
+*~
+*.bak
+*.swp
