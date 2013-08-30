@@ -84,6 +84,8 @@ public class Configurator {
 				// References.
 				// We have to make a new one.
 				getAndExportRef(iniFile);
+				// Just in case
+				return;
 			}
 		} else {
 			// Config file does not exist, ask for values for doc and source,
