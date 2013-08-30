@@ -94,8 +94,8 @@ public class Configurator {
 
 	private void getAndExportRef(File iniFile) {
 		// Here we make a new Reference from user input.
-		String doc = getLocation("documentation", "http://docs.oracle.com/javase/7/docs/api/");
-		String src = getLocation("source", System.getProperty("java.home") + "/src/");
+		String doc = getLocation("documentation", DEFAULT_SRC);
+		String src = getLocation("source", DEFAULT_DOC);
 
 		System.out.printf("Please choose a name for your Reference. Press enter for [%s]\n", "java");
 		String ref = saddle.getInput(new InputFilter() {
