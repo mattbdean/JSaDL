@@ -4,12 +4,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 import net.dean.console.InputFilter;
+import net.dean.parsers.ini.IniElement;
 import net.dean.parsers.ini.IniFile;
 import net.dean.parsers.ini.IniFileFactory;
+import net.dean.parsers.ini.IniFileTransformer;
 import net.dean.parsers.ini.IniSyntaxException;
 import net.dean.parsers.ini.Section;
+import net.dean.util.InternetUtils;
 
 /*
  * Configurator.java
@@ -21,7 +25,7 @@ import net.dean.parsers.ini.Section;
 public class Configurator {
 	public static final String DEFAULT_SRC = System.getProperty("java.home") + "/src";
 	public static final String DEFAULT_DOC = "http://docs.oracle.com/javase/7/docs/api/";
-	
+
 	private JSaDL saddle;
 	private Config config;
 
@@ -38,7 +42,7 @@ public class Configurator {
 		 * if config file exists
 		 *     try to create an IniFile object
 		 *     if it has at least one valid reference (contains a src and doc key and they have values)
-		 *         return
+		 *         job is done
 		 *     else if it has either a missing src or doc key
 		 *         get a src and/or doc values
 		 *             if those values don't exist or does not return a 200 code
@@ -64,7 +68,7 @@ public class Configurator {
 		//@formatter:on
 		if (iniFile.exists()) {
 			IniFile ini = new IniFileFactory().build(iniFile);
-			
+
 			// If the ini file has more than one section
 			if (ini.getSections().size() > 0) {
 				// Try to find a valid section
@@ -76,21 +80,107 @@ public class Configurator {
 					}
 				}
 			}
+		} else {
+			// Config file does not exist, ask for values for doc and source,
+			// and also name of default reference
+			String doc = getLocation("documentation", "http://docs.oracle.com/javase/7/docs/api/");
+			String src = getLocation("source", System.getProperty("java.home") + "/src/");
+			
+			System.out.printf("Please choose a name for your Reference. Press enter for [%s]\n", "java");
+			String ref = saddle.getInput(new InputFilter() {
+				
+				@Override
+				public boolean accept(String input) {
+					return true;
+				}
+			}, "java");
+			exportValues(src, doc, ref, iniFile);
+			config = new Config(iniFile);
 		}
 	}
+	
+	private void exportValues(String src, String doc, String refName, File f) {
+		IniFile ini = null;
+		if (f.exists()) {
+			try {
+				ini = new IniFileFactory().build(f);
+			} catch (IniSyntaxException | IOException e) {
+				// TODO: More specific handling. Maybe an IniSyntaxException
+				// causes this method to just create a new file
+				e.printStackTrace();
+			}
+		} else {
+			ini = new IniFileFactory().newIniFile();
+		}
+		
+		Section s = null;
+		if (ini.hasSection(refName)) {
+			s = ini.getSection(refName);
+			// Remove the section so we can add it again
+			// after the values have been corrected
+			ini.getSections().remove(s);
+		} else {
+			s = new Section(refName);
+		}
+		
+		if (!s.hasKey("src")) {
+			s.put(new IniElement("src", src));
+		}
+		if (!s.hasKey("doc")) {
+			s.put(new IniElement("doc", doc));
+		}
+		ini.getSections().add(s);
+		
+		IniFileTransformer.recommended().export(ini, f);
+	}
 
-	String getLocation(String name, String defaultValue) {
-		System.out.printf("Please choose the %s location. [enter] for %s\n", name, defaultValue);
+	private String getLocation(String name, String defaultValue) {
+		System.out.printf("Please choose a %s location for your reference. Press enter for [%s]\n", name, defaultValue);
 		return saddle.getInput(new InputFilter() {
-			
+
 			@Override
 			public boolean accept(String input) {
-				File f = new File(input);
-				return (f.exists() && f.isDirectory());
+				try {
+					URL url = null;
+					if (input.startsWith("http://") || input.startsWith("https://")) {
+						url = new URL(input);
+					} else {
+						url = new URL("file://" + input);
+					}
+					
+					// Checking for files
+					if (url.getProtocol().equals("file")) {
+						// If the directory does not exist or if it isn't a directory at all
+						if (!new File(url.getFile()).exists() || !new File(url.getFile()).isDirectory()) {
+							// Prompt the user if they really want to use it
+							return (saddle.getYesNoInput(String.format("%s doesn't seem to exist. Do you still want to use it? (y/n)", url.getFile())));
+						} else {
+							// The directory exists, add it
+							return true;
+						}
+					} else {
+						// HTTP or HTTPS
+						if (InternetUtils.doGetRequest(url.toExternalForm()).getResponseCode() != 200) {
+							// If the GET request doesn't return a 200, ask the user if they really want to use it
+							return (saddle.getYesNoInput(String.format("%s doesn't appear to be online.  Do you still want to use it? (y/n)", url.toExternalForm())));
+						} else {
+							// Returned 200, all is well
+							return true;
+						}
+					}
+				} catch (MalformedURLException e) {
+					// TODO: Better method than this
+					e.printStackTrace();
+					return false;
+				} catch (IOException e) {
+					e.printStackTrace();
+					return false;
+				}
+				
 			}
 		}, defaultValue);
 	}
-	
+
 	public Config getConfig() {
 		return config;
 	}
