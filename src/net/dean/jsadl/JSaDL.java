@@ -234,7 +234,10 @@ public class JSaDL extends ConsoleApplication {
 			Process p = pb.start();
 			// Make sure it starts
 			int exit = p.waitFor();
-			System.out.printf("%s exited with code %s\n", program, exit);
+			if (exit != 0) {
+				// Abnormal exit, warn the user
+			}
+			System.out.printf("%s exited abnormally with an exit code of %s.\n", program, exit);
 			return true;
 		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
